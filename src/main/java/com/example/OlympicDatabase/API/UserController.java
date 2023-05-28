@@ -4,8 +4,10 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.OlympicDatabase.domain.JWTokenEntity;
 import com.example.OlympicDatabase.domain.Role;
 import com.example.OlympicDatabase.domain.User;
+import com.example.OlympicDatabase.repo.JwtRepoFor;
 import com.example.OlympicDatabase.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
@@ -35,6 +37,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private JwtRepoFor jwtRepoFor;
     @GetMapping("getAllUsers")
     public ResponseEntity<List<User>> getALLUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
@@ -78,6 +82,10 @@ public class UserController {
                 tokens.put("refresh_token",refresh_token);
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(),tokens);
+
+                jwtRepoFor.save(new JWTokenEntity(
+                        access_token,refresh_token
+                ));
             } catch (Exception exception) {
                 response.setHeader("error", exception.getMessage());
                 response.setStatus(FORBIDDEN.value());

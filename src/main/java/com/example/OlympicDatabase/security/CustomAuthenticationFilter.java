@@ -2,6 +2,8 @@ package com.example.OlympicDatabase.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.example.OlympicDatabase.domain.JWTokenEntity;
+import com.example.OlympicDatabase.repo.JwtRepoFor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +32,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 
+
     private final AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
@@ -61,6 +65,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
 
+
 //        response.setHeader("access_token", access_token);
 //        response.setHeader("refresh_token", refresh_token);
         Map<String, String> tokens = new HashMap<>();
@@ -68,5 +73,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         tokens.put("refresh_token",refresh_token);
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(),tokens);
+
     }
 }
